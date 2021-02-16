@@ -45,11 +45,11 @@ def main():
                 continue
         elif len(keyword_input) == 0:
             keyword_input = generate_keyword(len(message))
-        keyword = formatting(keyword_input)
-        if len(keyword) < 2:
+        short_keyword = formatting(keyword_input)
+        if len(short_keyword) < 2:
             error_b("keyword")
             continue
-        keyword = expand_keyword(keyword, message)
+        keyword = expand_keyword(short_keyword, message)
         try:
             repetitions = int(input("Number of repetitions: "))
         except:
@@ -81,15 +81,15 @@ def main():
         else:
             message_output = message
             result_output = result
-        keyword_strength = round(len(keyword) / len(message) * 100, 1)
+        keyword_strength = round(len(short_keyword) / len(message) * 100, 1)
         if keyword_strength >= 100:
             keyword_strength = 100
         print(f"\n{a}: {message_output}")
         print(f"{len(message)} characters")
         print(f"Distribution: {frequency_analysis(message)}%")
-        print(f"\nKeyword: {keyword}")
-        print(f"{len(keyword)} characters")
-        print(f"Distribution: {frequency_analysis(keyword)}%")
+        print(f"\nKeyword: {short_keyword}")
+        print(f"{len(short_keyword)} characters")
+        print(f"Distribution: {frequency_analysis(short_keyword)}%")
         print(f"Strength: {keyword_strength}%")
         print(f"\n{b}: {result_output}")
         print(f"{len(result)} characters")
