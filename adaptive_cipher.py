@@ -38,14 +38,15 @@ def main():
         if ''.join(keyword_input[-4:]) == '.txt':
             try:
                 f = open(keyword_input, 'r')
-                keyword_input = f.read()
+                short_keyword = f.read()
                 f.close()
             except:
                 error_a()
                 continue
         elif len(keyword_input) == 0:
-            keyword_input = generate_keyword(len(message))
-        short_keyword = formatting(keyword_input)
+            short_keyword = generate_keyword(len(message))
+        else:
+            short_keyword = formatting(keyword_input)
         if len(short_keyword) < 2:
             error_b("keyword")
             continue
