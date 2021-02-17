@@ -2,7 +2,7 @@
 
 Vigenere cipher with adaptive alphabet for each symbol.
 
-### Download
+### Installation 
 
 https://github.com/minderrant/adaptive-cipher/releases/tag/1.0    
 Download AdaptiveCiphere.zip  
