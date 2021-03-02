@@ -4,14 +4,12 @@ import random
 from tqdm import trange
 
 # unicode from 33 to 126
-part1 = string.ascii_uppercase
-part2 = string.ascii_lowercase
-part3 = string.punctuation
-part4 = string.digits
-alphabet = part1 + part2 + part3 + part4
+alphabet = string.ascii_uppercase
+alphabet += string.ascii_lowercase
+alphabet += string.punctuation
+alphabet += string.digits
 
 
-# noinspection PyBroadException
 def main():
     while True:
         message_input = input("Enter message or filename: ")
@@ -20,15 +18,15 @@ def main():
                 f = open('Data/' + message_input, 'r')
                 message_input = f.read()
                 f.close()
-            except:
-                error_a()
+            except OSError:
+                print(f"ERROR: Data/{message_input} was not found")
+                repeat()
                 continue
         message = formatting(message_input)
         if len(message) < 2:
             error_b("message")
             continue
         all_characters = formatting_with_spaces(message_input)
-        save_spaces = ''
         if ' ' in all_characters:
             save_spaces = input("Save spaces (y/n): ")
             if save_spaces != 'y' and save_spaces != 'n':
@@ -37,11 +35,12 @@ def main():
         keyword_input = input("Enter keyword or filename or nothing to generate keyword: ")
         if ''.join(keyword_input[-4:]) == '.txt':
             try:
-                f = open(keyword_input, 'r')
+                f = open('Data/' + keyword_input, 'r')
                 short_keyword = f.read()
                 f.close()
-            except:
-                error_a()
+            except OSError:
+                print(f"ERROR: Data/{keyword_input} was not found")
+                repeat()
                 continue
         elif len(keyword_input) == 0:
             short_keyword = generate_keyword(len(message))
@@ -51,11 +50,7 @@ def main():
             error_b("keyword")
             continue
         keyword = expand_keyword(short_keyword, message)
-        try:
-            repetitions = int(input("Number of repetitions: "))
-        except:
-            error_a()
-            continue
+        repetitions = float(input("Number of repetitions: "))
         if repetitions <= 0:
             print("ERROR: number of repetitions must be greater than zero")
             repeat()
@@ -64,13 +59,13 @@ def main():
         if mode == 'e':
             result = message
             print("")
-            for _ in trange(repetitions):
+            for _ in trange(round(repetitions)):
                 result = AdaptiveCipher(keyword).encrypt(result)
             a, b = "Plaintext", "Ciphertext"
         elif mode == 'd':
             result = message
             print("")
-            for _ in trange(repetitions):
+            for _ in trange(round(repetitions)):
                 result = AdaptiveCipher(keyword).decrypt(result)
             a, b = "Ciphertext", "Plaintext"
         else:
@@ -95,7 +90,7 @@ def main():
         print(f"\n{b}: {result_output}")
         print(f"{len(result)} characters")
         print(f"Distribution: {frequency_analysis(result)}%")
-        filename = f"{b.lower() + '_x' + str(repetitions) + '.txt'}"
+        filename = f"{b.lower() + '_x' + str(round(repetitions)) + '.txt'}"
         if os.path.exists('Data'):
             pass
         else:
@@ -162,17 +157,17 @@ def shift_alphabet(alpha, key, key_freq, index, arg):
 def caesar_cipher(text, shift):
     shifted = text[shift:] + text[:shift]
     table = str.maketrans(text, shifted)
-    text = text.translate(table)
-    return text
+    result = text.translate(table)
+    return result
 
 
-# noinspection PyTypeChecker
 def rail_fence_cipher(text, n):
     fence = [[None] * len(text) for n in range(n)]
     rails = list(range(n - 1)) + list(range(n - 1, 0, -1))
     for n, x in enumerate(text):
         fence[rails[n % len(rails)]][n] = x
-    return ''.join([c for rail in fence for c in rail if c is not None])
+    result = ''.join([c for rail in fence for c in rail if c is not None])
+    return result
 
 
 def frequency_analysis(keyword):
