@@ -1,7 +1,8 @@
 import os
+import sys
+import time
 import string
 import random
-from tqdm import trange
 
 # unicode from 33 to 126
 alphabet = string.ascii_uppercase
@@ -57,17 +58,21 @@ def main():
             continue
         mode = input("Encrypt or decrypt (e/d): ")
         if mode == 'e':
-            result = message
-            print("")
-            for _ in trange(round(repetitions)):
-                result = AdaptiveCipher(keyword).encrypt(result)
             a, b = "Plaintext", "Ciphertext"
-        elif mode == 'd':
             result = message
             print("")
-            for _ in trange(round(repetitions)):
-                result = AdaptiveCipher(keyword).decrypt(result)
+            start_time = time.time()
+            for _ in range(round(repetitions)):
+                result = AdaptiveCipher(keyword).encrypt(result)
+            elapsed_time(time.time() - start_time)
+        elif mode == 'd':
             a, b = "Ciphertext", "Plaintext"
+            result = message
+            print("")
+            start_time = time.time()
+            for _ in range(round(repetitions)):
+                result = AdaptiveCipher(keyword).decrypt(result)
+            elapsed_time(time.time() - start_time)
         else:
             error_a()
             continue
@@ -81,14 +86,14 @@ def main():
         if keyword_strength >= 100:
             keyword_strength = 100
         print(f"\n{a}: {message_output}")
-        print(f"{len(message)} characters")
+        print(f"Characters: {len(message)}")
         print(f"Distribution: {frequency_analysis(message)}%")
         print(f"\nKeyword: {short_keyword}")
-        print(f"{len(short_keyword)} characters")
+        print(f"Characters: {len(short_keyword)}")
         print(f"Distribution: {frequency_analysis(short_keyword)}%")
         print(f"Strength: {keyword_strength}%")
         print(f"\n{b}: {result_output}")
-        print(f"{len(result)} characters")
+        print(f"Characters: {len(result)}")
         print(f"Distribution: {frequency_analysis(result)}%")
         filename = f"{b.lower() + '_x' + str(round(repetitions)) + '.txt'}"
         if os.path.exists('Data'):
@@ -116,7 +121,7 @@ class AdaptiveCipher:
     def encrypt(self, message):
         frequency = round(frequency_analysis(self.keyword))
         result = ''
-        for i in range(len(message)):
+        for i in progress_bar(range(len(message)), "Encryption: ", 50):
             x = i % len(self.keyword)
             value = ord(message[i]) + ord(self.keyword[x]) - 33
             if value >= 127:
@@ -129,7 +134,7 @@ class AdaptiveCipher:
     def decrypt(self, message):
         frequency = round(frequency_analysis(self.keyword))
         result = ''
-        for i in range(len(message)):
+        for i in progress_bar(range(len(message)), "Decryption: ", 50):
             x = i % len(self.keyword)
             value = ord(message[i]) - ord(self.keyword[x]) + 33
             if value < 32:
@@ -239,6 +244,33 @@ def insert_spaces(all_characters, result):
         if all_characters[i] == ' ':
             result.insert(i, ' ')
     return ''.join(result)
+
+
+def progress_bar(it, prefix="", size=60, file=sys.stdout):
+    count = len(it)
+
+    def show(j):
+        x = int(size * j / count)
+        file.write("%s|%s%s| %i/%i\r" % (prefix, "█" * x, " " * (size - x), j, count))
+        file.flush()
+    show(0)
+    for i, item in enumerate(it):
+        yield item
+        show(i + 1)
+    file.write("\n")
+    file.flush()
+
+
+def elapsed_time(interval):
+    min = interval // 60
+    if min >= 1:
+        hour = min // 60
+        if hour >= 1:
+            print(f"Elapsed time: {round(hour)} hours, {round(min % 60)} minutes")
+        else:
+            print(f"Elapsed time: {round(min)} minutes, {round(interval % 60)} seconds")
+    else:
+        print(f"Elapsed time: {round(interval, 2)} seconds")
 
 
 def error_a():
