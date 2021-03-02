@@ -261,16 +261,16 @@ def progress_bar(it, prefix="", size=60, file=sys.stdout):
     file.flush()
 
 
-def elapsed_time(interval):
-    min = interval // 60
+def elapsed_time(gap):
+    min = gap // 60
     if min >= 1:
         hour = min // 60
         if hour >= 1:
-            print(f"Elapsed time: {round(hour)} hours, {round(min % 60)} minutes")
+            print(f"Elapsed time: {round(hour)} hours, {round(min%60), 2} minutes, {round(gap%60), 2} seconds")
         else:
-            print(f"Elapsed time: {round(min)} minutes, {round(interval % 60)} seconds")
+            print(f"Elapsed time: {round(min)} minutes, {round(gap%60), 2} seconds")
     else:
-        print(f"Elapsed time: {round(interval, 2)} seconds")
+        print(f"Elapsed time: {round(gap, 2)} seconds")
 
 
 def error_a():
