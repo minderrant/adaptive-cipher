@@ -1,6 +1,6 @@
 # Adaptive Cipher
 
-Vigenere cipher with adaptive alphabet for each symbol.
+Vigenere cipher with adaptive alphabet for each character.
 
 ### Installation 
 
