@@ -4,11 +4,7 @@ import time
 import string
 import random
 
-# unicode from 33 to 126
-alphabet = string.ascii_uppercase
-alphabet += string.ascii_lowercase
-alphabet += string.punctuation
-alphabet += string.digits
+ALPHABET = string.ascii_uppercase
 
 
 def main():
@@ -116,15 +112,15 @@ def main():
 class AdaptiveCipher:
     def __init__(self, keyword):
         self.keyword = keyword
-        self.alphabet = alphabet
+        self.alphabet = ALPHABET
 
     def encrypt(self, message):
         frequency = round(frequency_analysis(self.keyword))
         result = ''
         for i in progress_bar(range(len(message)), "Encryption: ", 50):
             x = i % len(self.keyword)
-            value = ord(message[i]) + ord(self.keyword[x]) - 33
-            if value >= 127:
+            value = ord(message[i]) + ord(self.keyword[x]) - 65
+            if value >= 91:
                 value -= len(self.alphabet)
             result += chr(value)
             index = self.alphabet.index(self.keyword[i])
@@ -136,8 +132,8 @@ class AdaptiveCipher:
         result = ''
         for i in progress_bar(range(len(message)), "Decryption: ", 50):
             x = i % len(self.keyword)
-            value = ord(message[i]) - ord(self.keyword[x]) + 33
-            if value < 32:
+            value = ord(message[i]) - ord(self.keyword[x]) + 65
+            if value < 64:
                 value += len(self.alphabet)
             result += chr(value)
             index = self.alphabet.index(self.keyword[i])
@@ -178,12 +174,12 @@ def rail_fence_cipher(text, n):
 def frequency_analysis(keyword):
     if len(keyword) == 0:
         frequency = 1
-    elif len(keyword) <= len(alphabet):
-        value = [(1 / keyword.count(i) * 100) for i in alphabet if keyword.count(i) != 0]
+    elif len(keyword) <= len(ALPHABET):
+        value = [(1 / keyword.count(i) * 100) for i in ALPHABET if keyword.count(i) != 0]
         frequency = round(sum(value) / len(keyword), 1)
     else:
-        value = [keyword.count(i) * 100 / len(keyword) for i in alphabet]
-        ideal = 100 / len(alphabet)
+        value = [keyword.count(i) * 100 / len(keyword) for i in ALPHABET]
+        ideal = 100 / len(ALPHABET)
         result = []
         for i in value:
             if i < ideal:
@@ -212,7 +208,7 @@ def generate_keyword(length):
         keyword = []
         for i in range(length):
             while True:
-                letter = alphabet[random.randint(0, len(alphabet) - 1)]
+                letter = ALPHABET[random.randint(0, len(ALPHABET) - 1)]
                 if i > 0:
                     if letter != keyword[i - 1]:
                         keyword.append(letter)
@@ -230,12 +226,12 @@ def generate_keyword(length):
 
 
 def formatting(text):
-    message = [i for i in text if i in alphabet]
+    message = [i for i in text.upper() if i in ALPHABET]
     return ''.join(message)
 
 
 def formatting_with_spaces(text):
-    message = [i for i in text if i in alphabet or i == ' ']
+    message = [i for i in text.upper() if i in ALPHABET or i == ' ']
     return ''.join(message)
 
 
@@ -266,9 +262,11 @@ def elapsed_time(gap):
     if min >= 1:
         hour = min // 60
         if hour >= 1:
-            print(f"Elapsed time: {round(hour)} hours, {round(min%60), 2} minutes, {round(gap%60), 2} seconds")
+            print(f"Elapsed time: {round(hour)} hours, ", end='')
+            print(f"{round(min % 60), 2} minutes, {round(gap % 60), 2} seconds")
         else:
-            print(f"Elapsed time: {round(min)} minutes, {round(gap%60), 2} seconds")
+            print(f"Elapsed time: {round(min)} minutes, ", end='')
+            print(f"{round(gap % 60), 2} seconds")
     else:
         print(f"Elapsed time: {round(gap, 2)} seconds")
 
