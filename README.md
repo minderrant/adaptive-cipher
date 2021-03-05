@@ -5,7 +5,8 @@ Vigenere cipher with adaptive alphabet for each character.
 ### Installation 
  
 Download AdaptiveCiphere.zip  
-Run Adaptive Ciphere.exe
+Run Adaptive Ciphere.exe  
+https://github.com/minderrant/adaptive-cipher/releases/tag/1.0
 
 ### Screenshots
 
