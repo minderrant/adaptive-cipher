@@ -16,18 +16,20 @@ def main():
                 message_input = f.read()
                 f.close()
             except OSError:
-                print(f"ERROR: Data/{message_input} was not found")
+                print(f"\nError: Data/{message_input} was not found")
                 repeat()
                 continue
         message = formatting(message_input)
         if len(message) < 2:
-            error_b("message")
+            print("\nError: message must contain at least two letters")
+            repeat()
             continue
         all_characters = formatting_with_spaces(message_input)
         if ' ' in all_characters:
             save_spaces = input("Save spaces (y/n): ")
             if save_spaces != 'y' and save_spaces != 'n':
-                error_a()
+                print("\nError: invalid input")
+                repeat()
                 continue
         keyword_input = input("Enter keyword or filename or nothing to generate keyword: ")
         if ''.join(keyword_input[-4:]) == '.txt':
@@ -36,7 +38,7 @@ def main():
                 short_keyword = f.read()
                 f.close()
             except OSError:
-                print(f"ERROR: Data/{keyword_input} was not found")
+                print(f"\nError: Data/{keyword_input} was not found")
                 repeat()
                 continue
         elif len(keyword_input) == 0:
@@ -44,12 +46,13 @@ def main():
         else:
             short_keyword = formatting(keyword_input)
         if len(short_keyword) < 2:
-            error_b("keyword")
+            print("\nError: keyword must contain at least two letters")
+            repeat()
             continue
         keyword = expand_keyword(short_keyword, message)
         repetitions = float(input("Number of repetitions: "))
         if repetitions <= 0:
-            print("ERROR: number of repetitions must be greater than zero")
+            print("\nError: number of repetitions must be greater than zero")
             repeat()
             continue
         mode = input("Encrypt or decrypt (e/d): ")
@@ -59,7 +62,7 @@ def main():
             print("")
             start_time = time.time()
             for _ in range(round(repetitions)):
-                result = AdaptiveCipher(keyword).encrypt(result)
+                result = Adaptive(keyword).encrypt(result)
             elapsed_time(time.time() - start_time)
         elif mode == 'd':
             a, b = "Ciphertext", "Plaintext"
@@ -67,10 +70,11 @@ def main():
             print("")
             start_time = time.time()
             for _ in range(round(repetitions)):
-                result = AdaptiveCipher(keyword).decrypt(result)
+                result = Adaptive(keyword).decrypt(result)
             elapsed_time(time.time() - start_time)
         else:
-            error_a()
+            print("\nError: invalid input")
+            repeat()
             continue
         if ' ' in all_characters and save_spaces == 'y':
             message_output = all_characters
@@ -109,7 +113,7 @@ def main():
         continue
 
 
-class AdaptiveCipher:
+class Adaptive:
     def __init__(self, keyword):
         self.keyword = keyword
         self.alphabet = ALPHABET
@@ -124,7 +128,7 @@ class AdaptiveCipher:
                 value -= len(self.alphabet)
             result += chr(value)
             index = self.alphabet.index(self.keyword[i])
-            self.alphabet = shift_alphabet(self.alphabet, self.keyword, frequency, index, i)
+            self.alphabet = Adaptive.shift(self.alphabet, self.keyword, frequency, index, i)
         return result
 
     def decrypt(self, message):
@@ -137,22 +141,22 @@ class AdaptiveCipher:
                 value += len(self.alphabet)
             result += chr(value)
             index = self.alphabet.index(self.keyword[i])
-            self.alphabet = shift_alphabet(self.alphabet, self.keyword, frequency, index, i)
+            self.alphabet = Adaptive.shift(self.alphabet, self.keyword, frequency, index, i)
         return result
 
-
-def shift_alphabet(alpha, key, key_freq, index, arg):
-    if index % 2 == 0:
-        shift = round(index * (key_freq + arg) % len(key))
-    else:
-        shift = round(index * (len(key) + arg) % len(key))
-    alpha = caesar_cipher(alpha, shift)
-    if shift > 1:
-        alpha = rail_fence_cipher(alpha, shift)
-    if arg % 2 == 1:
-        pair = str.maketrans(key[arg - 1] + key[arg], key[arg] + key[arg - 1])
-        alpha = alpha.translate(pair)
-    return alpha
+    @staticmethod
+    def shift(alpha, key, key_freq, index, arg):
+        if index % 2 == 0:
+            shift = round(index * (key_freq + arg) % len(key))
+        else:
+            shift = round(index * (len(key) + arg) % len(key))
+        alpha = caesar_cipher(alpha, shift)
+        if shift > 1:
+            alpha = rail_fence_cipher(alpha, shift)
+        if arg % 2 == 1:
+            pair = str.maketrans(key[arg - 1] + key[arg], key[arg] + key[arg - 1])
+            alpha = alpha.translate(pair)
+        return alpha
 
 
 def caesar_cipher(text, shift):
@@ -249,6 +253,7 @@ def progress_bar(it, prefix="", size=60, file=sys.stdout):
         x = int(size * j / count)
         file.write("%s|%s%s| %i/%i\r" % (prefix, "█" * x, " " * (size - x), j, count))
         file.flush()
+
     show(0)
     for i, item in enumerate(it):
         yield item
@@ -271,18 +276,8 @@ def elapsed_time(gap):
         print(f"Elapsed time: {round(gap, 2)} seconds")
 
 
-def error_a():
-    print("ERROR: incorrect input")
-    repeat()
-
-
-def error_b(text):
-    print(f"ERROR: {text} must contain at least two letters")
-    repeat()
-
-
 def repeat():
-    input("\nPress Enter to repeat\n")
+    input("\nPress Enter to repeat")
     os.system('cls||clear')
 
 
